@@ -127,19 +127,35 @@ revealCountsButton.addEventListener("click", () => {
     status.textContent = "Tile counts revealed";
 });
 
+function tileAtPoint(clientX, clientY) {
+    return document.elementFromPoint(clientX, clientY)?.closest(".tile:not(.blocked)");
+}
+
+function finishDrag(pointerId) {
+    if (!dragging) return;
+    dragging = false;
+    if (board.hasPointerCapture(pointerId)) board.releasePointerCapture(pointerId);
+    finishSelection();
+}
+
 board.addEventListener("pointerdown", (event) => {
+    event.preventDefault();
     const tile = event.target.closest(".tile:not(.blocked)");
     if (tile) {
         dragging = true;
         selection = [];
+        board.setPointerCapture(event.pointerId);
         addTile(Number(tile.dataset.index));
     }
 });
-board.addEventListener("pointerover", (event) => {
-    const tile = event.target.closest(".tile:not(.blocked)");
+board.addEventListener("pointermove", (event) => {
+    event.preventDefault();
+    const tile = tileAtPoint(event.clientX, event.clientY);
     if (dragging && tile) addTile(Number(tile.dataset.index));
 });
-window.addEventListener("pointerup", () => { if (dragging) { dragging = false; finishSelection(); } });
+board.addEventListener("pointerup", (event) => finishDrag(event.pointerId));
+board.addEventListener("pointercancel", (event) => finishDrag(event.pointerId));
+window.addEventListener("pointerup", (event) => finishDrag(event.pointerId));
 document.querySelector("#resetButton").addEventListener("click", () => { found.clear(); revealedHints.clear(); countsVisible = false; selection = []; reveals = 2; document.querySelectorAll(".found").forEach((element) => element.classList.remove("found")); updateTileVisibility(); updateTileCounts(); foundCount.textContent = "0"; status.textContent = "Start with any letter."; renderHints(); });
 
 updateTileVisibility();
