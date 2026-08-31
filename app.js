@@ -40,7 +40,7 @@ function renderHints() {
         const canReveal = solutions.some((solution, index) => solution.word.length === length && !found.has(index) && !revealedHints.has(index));
         const foundMarkup = foundWords.length ? `<ul class="found-words">${foundWords.map((solution) => `<li>${solution.word}</li>`).join("")}</ul>` : "";
         const hintedMarkup = hintedWords.length ? `<ul class="hint-words">${hintedWords.map((solution) => `<li>${solution.word[0]}${"*".repeat(solution.word.length - 1)} (${solution.word.length} letters)</li>`).join("")}</ul>` : "";
-        return `<section class="hint-group${remaining ? "" : " complete"}"><h3>${length} letters</h3>${foundMarkup}${hintedMarkup}<p><em>+${remaining} words left</em> - ${canReveal && reveals ? `<button class="reveal-link" type="button" data-length="${length}">Reveal a random word</button>` : remaining ? "No unrevealed hints" : "All words found"}</p></section>`;
+        return `<section class="hint-group${remaining ? "" : " complete"}"><h3>${length} letters</h3>${foundMarkup}${hintedMarkup}<p><em>+${remaining} mots restant</em> - ${canReveal && reveals ? `<button class="reveal-link" type="button" data-length="${length}">Révéler un mot</button>` : remaining ? "Aucun indices restants" : "Tous les mots trouvés"}</p></section>`;
     }).join("");
     revealsRemaining.textContent = reveals;
     revealCountsButton.disabled = countsVisible || !reveals;
@@ -88,11 +88,11 @@ function markSolutionFound(match, message) {
     found.add(match);
     document.querySelectorAll(".tile").forEach((tile) => { if (solutions[match].path.includes(Number(tile.dataset.index))) tile.classList.add("found"); });
     updateTileVisibility();
-    status.textContent = message || `${solutions[match].word} found`;
+    status.textContent = message || `${solutions[match].word} trouvé`;
     foundCount.textContent = found.size;
     updateTileCounts();
     renderHints();
-    if (found.size === solutions.length) status.textContent = "Puzzle complete. Nice work.";
+    if (found.size === solutions.length) status.textContent = "Puzzle terminé ! Bravo !";
 }
 
 function finishSelection() {
@@ -101,7 +101,7 @@ function finishSelection() {
     if (match >= 0 && !found.has(match)) {
         markSolutionFound(match);
     } else if (match < 0) {
-        status.textContent = "That path is not in today’s four.";
+        status.textContent = "Ce mot n'est pas correct. Le mot peut être bon mais avec les mauvaises tuiles.";
     }
     selection = [];
     paintSelection();
@@ -115,7 +115,7 @@ hintGroups.addEventListener("click", (event) => {
     reveals -= 1;
     revealedHints.add(match);
     renderHints();
-    status.textContent = `${solutions[match].word[0]}... hint revealed`;
+    status.textContent = `${solutions[match].word[0]}... indices révélés.`;
 });
 
 revealCountsButton.addEventListener("click", () => {
@@ -124,7 +124,7 @@ revealCountsButton.addEventListener("click", () => {
     countsVisible = true;
     updateTileCounts();
     renderHints();
-    status.textContent = "Tile counts revealed";
+    status.textContent = "Indices de tuiles révélés.";
 });
 
 function tileAtPoint(clientX, clientY) {
@@ -156,7 +156,7 @@ board.addEventListener("pointermove", (event) => {
 board.addEventListener("pointerup", (event) => finishDrag(event.pointerId));
 board.addEventListener("pointercancel", (event) => finishDrag(event.pointerId));
 window.addEventListener("pointerup", (event) => finishDrag(event.pointerId));
-document.querySelector("#resetButton").addEventListener("click", () => { found.clear(); revealedHints.clear(); countsVisible = false; selection = []; reveals = 2; document.querySelectorAll(".found").forEach((element) => element.classList.remove("found")); updateTileVisibility(); updateTileCounts(); foundCount.textContent = "0"; status.textContent = "Start with any letter."; renderHints(); });
+document.querySelector("#resetButton").addEventListener("click", () => { found.clear(); revealedHints.clear(); countsVisible = false; selection = []; reveals = 2; document.querySelectorAll(".found").forEach((element) => element.classList.remove("found")); updateTileVisibility(); updateTileCounts(); foundCount.textContent = "0"; status.textContent = "Commence par une lettre."; renderHints(); });
 
 updateTileVisibility();
 updateTileCounts();
